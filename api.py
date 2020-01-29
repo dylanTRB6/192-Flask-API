@@ -1,14 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow 
+from flask_cors import CORS, cross_origin
 import os 
 
 # File Initializations
 app = Flask(__name__)
+CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
-
+""" cors = CORS(app, resources={r"/api/*": {"origins": "*"}}) """
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+""" app.config['CORS_HEADERS'] = ‘Access-Control-Allow-Origin’ """
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -78,9 +81,10 @@ def get_eatery(id):
 
 @app.route('/eatery/add', methods=['POST'])
 def add_eatery():
-    name = request.json['name']
-    address = request.json['address']
-    contact = request.json['contact']
+    
+    name = request.get_json(force=True)['name']
+    address = request.get_json(force=True)['address']
+    contact = request.get_json(force=True)['contact']
 
     new_eatery = Eatery(name, address, contact)
 
@@ -95,7 +99,7 @@ def delete_eatery(id):
     reviews = Review.query.filter_by(eatery_id=id).all()
 
     for review in reviews:
-        db.session.delelte(review)
+        db.session.delete(review)
     db.session.delete(eatery)
     db.session.commit()
 
@@ -147,8 +151,8 @@ def add_review(id):
     eatery = Eatery.query.get(id)
     reviews = Review.query.filter_by(eatery_id=id).all()
 
-    review_text = request.json['review_text']
-    rating = request.json['rating']
+    review_text = request.get_json(force=True)['review_text']
+    rating = request.get_json(force=True)['rating']
 
     eatery.rating = ((eatery.rating*len(reviews)) + float(rating))/(len(reviews) + 1)
 
