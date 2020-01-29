@@ -8,10 +8,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
-""" cors = CORS(app, resources={r"/api/*": {"origins": "*"}}) """
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
-""" app.config['CORS_HEADERS'] = ‘Access-Control-Allow-Origin’ """
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -109,9 +107,9 @@ def delete_eatery(id):
 def update_eatery(id):
     eatery = Eatery.query.get(id)
 
-    eatery.name = request.json['name']
-    eatery.address = request.json['address']
-    eatery.contact = request.json['contact']
+    eatery.name = request.get_json(force=True)['name']
+    eatery.address = request.get_json(force=True)['address']
+    eatery.contact = request.get_json(force=True)['contact']
 
     db.session.commit()
 
@@ -122,7 +120,7 @@ def flag_eatery(id):
     eatery = Eatery.query.get(id)
 
     eatery.flag = True 
-    eatery.why_flag = request.json['why_flag']
+    eatery.why_flag = request.get_json(force=True)['why_flag']
 
     db.session.commit()
 
@@ -182,7 +180,7 @@ def flag_review(e_id, r_id):
 
     review.flag = True 
     review.flagged_before = True 
-    review.why_flag = request.json['why_flag']
+    review.why_flag = request.get_json(force=True)['why_flag']
 
     db.session.commit()
 
