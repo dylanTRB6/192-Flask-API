@@ -120,6 +120,20 @@ reviews_schema = ReviewSchema(many=True) # holds the schema structure for multip
 
 # Endpoints for Eatery Related Data
 """
+Method Name: get_eatery
+Creation: 1/20/20
+Purpose http get request for a single eatery 
+Arguments: id 
+Required Tables: eatery 
+Return Value: single eatery in json format 
+"""
+@app.route('/eatery/<int:id>', methods=['GET'])
+def get_eatery(id):
+     eatery = Eatery.query.get(id) # query single eatery 
+
+     return eatery_schema.jsonify(eatery)	 
+
+"""
 Method Name: get_eateries
 Creation: 1/20/20
 Purpose: http get request for all eateries
